@@ -35,7 +35,7 @@ if "PBS_QUEUE" in os.environ:
         UseGPU=False
     if "gpu" in os.environ["PBS_QUEUE"]:
         UseGPU=True
-        gpuid=int(os.environ["PBS_QUEUE"][3:4])
+        gpuid=int(os.environ["PBS_QUEUE"][3:4])-1
 
 if UseGPU:
     print "Using GPU",gpuid
