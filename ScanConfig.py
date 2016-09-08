@@ -9,7 +9,7 @@ Config={
     "MaxEvents":1e6,
     "FractionTest":0.1,
 
-    "M_min":-1500,
+    "M_min":-150,
     "M_max":200,
 
     "Sigma":0.,
@@ -26,7 +26,7 @@ Config={
     "WeightInitialization":"'normal'",
 
     "Mode":"'Classification'",
-    "NBins":1000.,
+    "NBins":1000,
 
     "loss":"'categorical_crossentropy'",
     "optimizer":"'rmsprop'"
