@@ -26,18 +26,18 @@ def GaussianDiagonalMatrix(min,max,bins,sigma):
 
 
 def BinVariable(y,bins,min,max,Sigma=0.):
-    binwidth=(max-min)/float(bins)
+    binwidth=(max-min)/float(bins-1)
 
     Y= np_utils.to_categorical(np.digitize(y,bins=np.arange(min,max,binwidth)),bins)
     
     print Y.shape
 
     if Sigma==0.:
-        return Y
-
+        return Y[:,:bins]
+    
     M=GaussianDiagonalMatrix(min,max,bins,Sigma)
 
-    return np.transpose(np.dot(M,np.transpose(Y)))
+    return np.transpose(np.dot(M,np.transpose(Y)))[:,:bins]
 
 
 

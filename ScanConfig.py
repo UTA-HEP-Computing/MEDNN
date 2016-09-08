@@ -10,7 +10,7 @@ Config={
     "FractionTest":0.1,
 
     "M_min":-1500,
-    "M_max":1500,
+    "M_max":200,
 
     "Sigma":0.,
 
@@ -26,15 +26,15 @@ Config={
     "WeightInitialization":"'normal'",
 
     "Mode":"'Classification'",
-    "NBins":100.,
+    "NBins":1000.,
 
     "loss":"'categorical_crossentropy'",
     "optimizer":"'rmsprop'"
 
 }
 
-Params={ "Width":[16,32,64,128,256,512,1024],
-         "Depth":range(0,10),
+Params={ "Width":[32,64,128,256,512],
+         "Depth":range(1,10),
           }
 
 PS=Permutator(Params)
@@ -55,7 +55,7 @@ print "Picked combination: ",i
 for k in Combos[i]:
     Config[k]=Combos[i][k]
 
-Name="TwoBodyMassCalcDNN"
+Name="MEDNN"
 
 for MetaData in Params.keys():
     val=str(Config[MetaData]).replace('"',"")
