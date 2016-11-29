@@ -14,7 +14,7 @@ if "Config" in dir():
 # Load the Data
 from MEDNN.LoadData import *
 
-if Mode=="Regression":
+if Mode=="Regression" or Mode=="Highway":
     Binning=False
 if Mode=="Classification":
     Binning=[NBins,M_min,M_max,Sigma]
@@ -29,17 +29,28 @@ if Binning:
                                                                         Shuffle=False,
                                                                         Bin=Binning)
 else:
-    (Train_X, Train_Y),(Test_X, Test_Y)= LoadData(FileNames,
+    (Train_X, Train_Y),(Test_X, Test_Y)= LoadData(InputFiles,
                                                   FractionTest=FractionTest,
                                                   MaxEvents=MaxEvents,
                                                   MinEvents=-1,
                                                   Shuffle=False,
                                                   Bin=Binning)
 
+
 # Normalize the Data... seems to be critical!
 Norm=np.max(Train_X)
 Train_X=Train_X/Norm
 Test_X=Test_X/Norm
+
+
+#MassNorm=(M_max-M_min)
+#Train_YN=(Train_Y-M_min)/MassNorm
+#Test_YN=(Test_Y-M_min)/MassNorm
+
+M=np.mean(Train_Y)
+V=np.var(Train_Y)
+Train_YN=(Train_Y-M)/V+.5
+Test_YN=(Test_Y-M)/V+.5
 
 # Build/Load the Model
 from DLModels.Regression import *
@@ -62,6 +73,9 @@ else:
         MyModel=FullyConnectedRegression(Name,NInputs,Width,Depth,WeightInitialization)
     if Mode=="Classification":
         MyModel=FullyConnectedClassification(Name,NInputs,Width,Depth,Binning[0],WeightInitialization)
+    if Mode=="Highway":
+        MyModel=HighwayRegression(Name,NInputs,Width,Depth,WeightInitialization)
+        Mode="Regression"
 
     # Build it
     MyModel.Build()
@@ -71,7 +85,7 @@ MyModel.Model.summary()
 
 # Compile The Model
 print "Compiling Model."
-MyModel.Compile(loss=loss,optimizer=optimizer) 
+MyModel.Compile(Loss=loss,Optimizer=optimizer) 
 
 # Train
 if Train:
@@ -79,7 +93,7 @@ if Train:
     callbacks=[EarlyStopping(monitor='val_loss', patience=2, verbose=1, mode='min') ]
     callbacks=[]
     if Mode=="Regression":
-        MyModel.Train(Train_X, Train_Y, Epochs, BatchSize,Callbacks=callbacks)
+        MyModel.Train(Train_X, Train_YN, Epochs, BatchSize,Callbacks=callbacks)
         score = MyModel.Model.evaluate(Test_X, Test_Y, batch_size=BatchSize)
 
     if Mode=="Classification":
@@ -96,7 +110,7 @@ if Train:
 if Analyze:
     from DLAnalysis.Regression import *
     if Mode=="Regression":
-        RegressionAnalysis(MyModel,Test_X,Test_Y,M_min,M_max,BatchSize)
+        RegressionAnalysis(MyModel,Test_X,Test_Y,M_min,M_max,BatchSize,M,V)
 
     if Mode=="Classification":
         ClassificationAnalysis(MyModel,Test_X,Test_Y,Test_YT,M_min,M_max,NBins,BatchSize)

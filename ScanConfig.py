@@ -14,8 +14,8 @@ Config={
 
     "Sigma":0.,
 
-    "Epochs":100,
-    "BatchSize":2048*8,
+    "Epochs":5,
+    "BatchSize": 2048*1,
     
     "LearningRate":0.005,
     
@@ -25,17 +25,24 @@ Config={
 
     "WeightInitialization":"'normal'",
 
-    "Mode":"'Classification'",
-    "NBins":1000,
+#    "Mode":"'Classification'",
+#    "NBins":1000,
+#    "loss":"'categorical_crossentropy'",
+#    "optimizer":"'rmsprop'"
 
-    "loss":"'categorical_crossentropy'",
-    "optimizer":"'rmsprop'"
+    "Mode":"'Highway'",
+    "loss":"'mae'",
+    "optimizer":"'adam'"
 
 }
 
 Params={ "Width":[32,64,128,256,512],
          "Depth":range(1,10),
           }
+
+if "TestMode" in dir() and TestMode:
+    print "Test mode."
+    Config["MaxEvents"]=1e4
 
 PS=Permutator(Params)
 Combos=PS.Permutations()
