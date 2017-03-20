@@ -8,19 +8,25 @@ parser.add_argument('--gpu', dest='gpuid', default="")
 parser.add_argument('--cpu', action="store_true")
 parser.add_argument('--NoTrain', action="store_true")
 parser.add_argument('--NoAnalysis', action="store_true")
+parser.add_argument('--NoData', action="store_true")
 parser.add_argument('--Test', action="store_true")
 parser.add_argument('-s',"--hyperparamset", default="0")
+parser.add_argument('-m',"--mode", default="3")
 parser.add_argument('--generator', action="store_true")
 
 # Configure based on commandline flags... this really needs to be cleaned up
 args = parser.parse_args()
 Train = not args.NoTrain
 Analyze = not args.NoAnalysis
+ReadData = not args.NoData
 TestMode = args.Test
 UseGPU = not args.cpu
 gpuid = args.gpuid
 if args.hyperparamset:
     HyperParamSet = int(args.hyperparamset)
+
+Mode = int(args.mode)
+
 ConfigFile = args.config
 useGenerator = args.generator
 
@@ -37,9 +43,14 @@ if "PBS_QUEUE" in os.environ:
         UseGPU=True
         gpuid=int(os.environ["PBS_QUEUE"][3:4])
 
+TheanoConfig=""
+        
+if TestMode:
+    TheanoConfig+="optimizer=fast_compile,exception_verbosity=high,"
 if UseGPU:
     print "Using GPU",gpuid
-    os.environ['THEANO_FLAGS'] = "mode=FAST_RUN,device=gpu%s,floatX=float32,force_device=True" % (gpuid)
+    TheanoConfig+="mode=FAST_RUN,device=gpu"+str(gpuid)+",floatX=float32,force_device=True"
 else:
     print "Using CPU."
 
+os.environ['THEANO_FLAGS'] = TheanoConfig

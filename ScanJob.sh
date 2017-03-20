@@ -9,7 +9,7 @@ output=ScanLogs/$PBS_ARRAYID.log
 
 echo $output > $output
 
-python -m MEDNN.Experiment &> $output
+python -m MEDNN.Experiment -m 1 &> $output
 
 
 
